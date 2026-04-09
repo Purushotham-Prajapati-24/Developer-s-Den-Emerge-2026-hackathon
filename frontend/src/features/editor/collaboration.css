@@ -1,0 +1,44 @@
+/* Design.md Specification:
+ * The Collaborative Cursor (Signature Component)
+ * Instead of a simple line, cursors are represented by a 2px vertical bar of secondary 
+ * (or tertiary) with a trailing label-sm flag containing the user's name. 
+ * The flag uses secondary_container with 40% opacity and a backdrop-blur.
+ */
+
+.yRemoteSelection {
+  background-color: rgb(250, 129, 0, 0.5); /* Highlight color */
+}
+
+.yRemoteSelectionHead {
+  position: absolute;
+  border-left: 2px solid orange; 
+  /* Fallback color, will be overridden dynamically inline by y-monaco depending on user.color */
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.yRemoteSelectionHead::after {
+  position: absolute;
+  content: attr(data-client-name); /* Custom attributes injected via YJS */
+  left: 0;
+  top: -1.2em; /* Float above the line */
+  white-space: nowrap;
+  
+  /* Kinetic Terminal Typography */
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  
+  padding: 2px 6px;
+  border-radius: 4px 4px 4px 0;
+  
+  /* Glassmorphism styling prescribed by Design.md */
+  background: rgba(0, 227, 253, 0.4); /* #00e3fd at 40% */
+  backdrop-filter: blur(8px); /* Blur effect mimicking the glass overlap */
+  color: #f1f3fc; /* on_surface */
+  
+  pointer-events: none;
+  z-index: 10;
+}

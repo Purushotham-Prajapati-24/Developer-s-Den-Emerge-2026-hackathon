@@ -46,7 +46,7 @@
 
 ## 🧠 AI Integration
 
-- OpenAI API (only paid part)
+- Groq Api
 
 ---
 
