@@ -18,31 +18,34 @@ import OAuthCallback from './pages/OAuthCallback';
 
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-// Recover session from refresh token on app boot
+// Recover session from refresh token cookie on cold boot (no token in storage)
 const SessionHydrator = ({ children }: { children: React.ReactNode }) => {
-  const { setAuth, accessToken, user } = useAuthStore();
+  const { setAuth, logout, accessToken } = useAuthStore();
   const hasAttempted = useRef(false);
 
   useEffect(() => {
-    // If we have an accessToken but NO user data (e.g. after page refresh)
-    // Or if we have NOTHING at all - we attempt a silent refresh.
-    if ((!accessToken || !user) && !hasAttempted.current) {
-      hasAttempted.current = true;
-      
-      // Attempt silent refresh using httpOnly cookie
-      fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'}/auth/refresh`,
-        { method: 'POST', credentials: 'include' }
-      )
-        .then((r) => (r.ok ? r.json() : null))
-        .then((data) => {
-          if (data?.accessToken) {
-            setAuth(data.accessToken, data.user);
-          }
-        })
-        .catch(() => null);
-    }
-  }, [accessToken, user, setAuth]);
+    // Only fire when there is genuinely NO access token (cold boot / after explicit logout).
+    // If we have a token, user data is already persisted — no refresh needed.
+    if (accessToken || hasAttempted.current) return;
+    hasAttempted.current = true;
+
+    // Attempt silent refresh using httpOnly cookie
+    fetch(
+      `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'}/auth/refresh`,
+      { method: 'POST', credentials: 'include' }
+    )
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        if (data?.accessToken) {
+          setAuth(data.accessToken, data.user);
+        }
+      })
+      .catch(() => {
+        // No valid refresh cookie — ensure store is clean so guards redirect to /auth
+        logout();
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once on mount only
 
   return <>{children}</>;
 };
@@ -69,9 +72,10 @@ function AppRoutes() {
         {/* Auth — only accessible when not logged in */}
         <Route element={<PublicRoute />}>
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/oauth-callback" element={<OAuthCallback />} />
         </Route>
 
+        {/* OAuth callback — must always be accessible regardless of auth state */}
+        <Route path="/oauth-callback" element={<OAuthCallback />} />
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/onboarding" element={<OnboardingPage />} />

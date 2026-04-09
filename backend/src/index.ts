@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+import path from 'path';
+
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
@@ -67,8 +69,16 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok', service: 'DevVerse Backend Engine' });
 });
 
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, '../../public')));
+
+// Catch-all route to serve index.html for SPA frontend routing
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, '../../public/index.html'));
+});
+
 // Initialize WebSocket (Yjs CRDT collaborative sync)
-initSocketService({ server, corsOrigin: FRONTEND_URL });
+initSocketService({ server, corsOrigin: ALLOWED_ORIGINS });
 
 server.listen(PORT, () => {
   console.log(`🚀 DevVerse Backend Server live on port ${PORT}`);

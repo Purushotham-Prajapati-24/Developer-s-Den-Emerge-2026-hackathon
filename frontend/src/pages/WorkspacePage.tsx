@@ -112,6 +112,7 @@ const InviteModal = ({ projectId, onClose }: InviteModalProps) => {
 export default function WorkspacePage() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore(); // read once at component scope — no hook violations
 
   const [project, setProject] = useState<Project | null>(null);
   const [pendingInvites, setPendingInvites] = useState<Project['pendingInvitations']>([]);
@@ -261,9 +262,17 @@ export default function WorkspacePage() {
           {/* Monaco Editor */}
           <div className="flex-1 overflow-hidden">
             {(() => {
-              const myId = useAuthStore.getState().user?._id || useAuthStore.getState().user?.id;
-              const myRole = project.collaborators.find(c => c.user._id === myId || c.user === myId)?.role || 'reader';
-              
+              const myId = user?._id || user?.id;
+              // Check if user is the project owner first (owners are NOT in collaborators array)
+              const isOwner = project.owner && (
+                (project.owner as any)._id === myId ||
+                (project.owner as any).id === myId ||
+                (project.owner as any) === myId
+              );
+              const collabEntry = project.collaborators.find(
+                c => c.user._id === myId || (c.user as any) === myId || (c.user as any).id === myId
+              );
+              const myRole = isOwner ? 'owner' : (collabEntry?.role || 'editor');
               return (
                 <MonacoCollaborative
                   projectId={projectId!}

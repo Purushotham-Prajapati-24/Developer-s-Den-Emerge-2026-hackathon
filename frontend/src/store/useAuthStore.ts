@@ -34,8 +34,10 @@ export const useAuthStore = create<AuthState>()(
         })),
     }),
     {
-      name: 'auth-storage', // saves to localStorage implicitly for the accessToken mapping
-      partialize: (state) => ({ accessToken: state.accessToken }), // ONLY persist token, sensitive data stays in memory
+      name: 'auth-storage',
+      // Persist both token AND user so page reloads don't lose session state.
+      // This prevents SessionHydrator from firing /auth/refresh on every load.
+      partialize: (state) => ({ accessToken: state.accessToken, user: state.user }),
     }
   )
 );
