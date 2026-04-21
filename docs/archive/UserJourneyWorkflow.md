@@ -1,4 +1,4 @@
-# 🧭 User Journey — DevVerse
+# 🧭 User Journey — Developer's Den
 
 ---
 

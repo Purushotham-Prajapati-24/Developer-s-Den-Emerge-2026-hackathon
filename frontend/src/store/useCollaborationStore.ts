@@ -26,6 +26,7 @@ interface CollaborationState {
   users: CollabUser[];
   messages: Message[];
   files: FileNode[];
+  visitedFiles: { name: string; content: string }[];
   activeFileId: string | null;
   terminalOutput: string;
   
@@ -34,8 +35,9 @@ interface CollaborationState {
   setMessages: (msgs: Message[]) => void;
   setFiles: (files: FileNode[]) => void;
   setActiveFileId: (fileId: string | null) => void;
+  addVisitedFile: (name: string, content: string) => void;
   appendTerminal: (text: string) => void;
-  /** Inject a message from the Emerge AI Architect into the chat */
+  /** Inject a message from the Developer's Den AI Architect into the chat */
   addAIMessage: (text: string) => void;
 }
 
@@ -43,6 +45,7 @@ export const useCollaborationStore = create<CollaborationState>((set) => ({
   users: [],
   messages: [],
   files: [],
+  visitedFiles: [],
   activeFileId: null,
   terminalOutput: '',
 
@@ -57,6 +60,14 @@ export const useCollaborationStore = create<CollaborationState>((set) => ({
   setFiles: (files) => set({ files }),
 
   setActiveFileId: (activeFileId) => set({ activeFileId }),
+
+  addVisitedFile: (name, content) => set((state) => {
+    // Keep only the 5 most recent unique files
+    const filtered = state.visitedFiles.filter(f => f.name !== name);
+    return {
+      visitedFiles: [{ name, content }, ...filtered].slice(0, 5)
+    };
+  }),
 
   appendTerminal: (text) => set((state) => ({ 
     terminalOutput: state.terminalOutput + text 

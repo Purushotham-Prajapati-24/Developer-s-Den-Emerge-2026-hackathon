@@ -189,8 +189,8 @@ export const CollaboratorsPanel = ({
           </div>
         </div>
 
-        {/* Pending Invites Section - Only for Owner/Editor */}
-        {isOwnerOrEditor && pendingInvites.length > 0 && (
+        {/* Pending Invites Section - Visible to All */}
+        {pendingInvites.length > 0 && (
           <div>
             <h4 className="text-[10px] text-[#3a4458] font-bold uppercase tracking-[0.2em] mb-3">Pending ({pendingInvites.length})</h4>
             <div className="space-y-2">

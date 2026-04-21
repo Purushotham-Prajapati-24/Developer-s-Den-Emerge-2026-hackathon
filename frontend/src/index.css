@@ -1,23 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #0a0e14;
-  --color-surface-container-low: #0f141a;
-  --color-surface-container-highest: #1b2028;
-  --color-surface-bright: #262d3a;
-  --color-primary: #b6a0ff;
-  --color-primary-dim: #7e51ff;
-  --color-secondary: #00e3fd;
-  --color-on-surface: #f1f3fc;
-  --color-on-surface-variant: #8e96a4;
+  --color-surface: #05080c;
+  --color-surface-container: #0d1117;
+  --color-surface-bright: #161b22;
+  --color-surface-accent: #1e252e;
+  
+  --color-primary: #10b981;
+  --color-primary-dim: #059669;
+  --color-secondary: #06b6d4;
+  --color-secondary-dim: #0891b2;
+  
+  --color-on-surface: #f1f3f9;
+  --color-on-surface-muted: #8b949e;
+  --color-on-surface-dim: #484f58;
 
   --font-space-grotesk: "Space Grotesk", sans-serif;
-  --font-inter: "Inter", sans-serif;
+  --font-inter: "IBM Plex Sans", sans-serif;
   --font-jetbrains-mono: "JetBrains Mono", monospace;
+
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-surface-container/60 backdrop-blur-md border border-white/5;
+  }
+  .glass-dark {
+    @apply bg-surface/80 backdrop-blur-xl border border-white/10;
+  }
+  .glass-emerald {
+    @apply bg-primary/10 backdrop-blur-md border border-primary/20;
+  }
+  .text-glow-emerald {
+    text-shadow: 0 0 8px var(--color-primary-dim);
+  }
 }
 
 body {
   margin: 0;
   background-color: var(--color-surface);
   color: var(--color-on-surface);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-space-grotesk);
+}
+
+code, .font-mono {
+  font-family: var(--font-jetbrains-mono);
+}
+

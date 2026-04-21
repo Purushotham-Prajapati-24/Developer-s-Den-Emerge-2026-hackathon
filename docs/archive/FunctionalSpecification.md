@@ -1,4 +1,4 @@
-# ⚙️ Functional Specification — DevVerse
+# ⚙️ Functional Specification — Developer's Den
 
 ---
 

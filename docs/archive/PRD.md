@@ -1,7 +1,7 @@
-# 🚀 DEVVERSE — Cloud-Based Collaborative IDE
+# 🚀 Developer's Den — Cloud-Based Collaborative IDE
 
 ## 📌 Overview
-DevVerse is a cloud-based collaborative IDE designed for 100+ simultaneous users with real-time editing, AI assistance, and social developer profiles.
+Developer's Den is a cloud-based collaborative IDE designed for 100+ simultaneous users with real-time editing, AI assistance, and social developer profiles.
 
 ---
 
@@ -15,7 +15,7 @@ Existing collaborative IDEs:
 ---
 
 ## 💡 Solution
-DevVerse provides:
+Developer's Den provides:
 - Real-time collaborative coding (100+ users)
 - AI-powered code orchestration
 - Developer social profiles (like GitHub + IDE)

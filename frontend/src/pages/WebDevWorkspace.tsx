@@ -37,63 +37,86 @@ const InviteModal = ({ projectId, onClose }: { projectId: string; onClose: () =>
     setStatus(null);
     try {
       await api.post(`/projects/${projectId}/invite`, { username, role });
-      setStatus({ type: 'success', msg: `${username} added as ${role}` });
+      setStatus({ type: 'success', msg: `${username} added. Sending transmission...` });
       setUsername('');
     } catch (err: any) {
-      setStatus({ type: 'error', msg: err.response?.data?.message || 'Invite failed' });
+      setStatus({ type: 'error', msg: err.response?.data?.message || 'Uplink failed' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a0d12]/80 backdrop-blur-[8px]">
-      <div className="bg-[#111720] border border-[#1e2a3a] rounded-2xl p-7 w-full max-w-sm shadow-2xl">
-        <h3 className="font-['Space_Grotesk'] font-semibold text-lg text-[#f1f3fc] mb-1">Invite Collaborator</h3>
-        <p className="text-sm text-[#8a98b3] font-['Inter'] mb-6">Add someone to this workspace.</p>
-        <form onSubmit={handleInvite} className="space-y-4">
-          <div>
-            <label className="block text-xs text-[#8a98b3] mb-1.5 font-['Inter'] uppercase tracking-wider">Username</label>
-            <input
-              type="text" value={username} onChange={(e) => setUsername(e.target.value)}
-              required autoFocus
-              className="w-full px-4 py-2.5 rounded-lg bg-[#0a0d12] border border-[#1e2a3a] text-[#f1f3fc] font-mono text-sm placeholder-[#3a4458] focus:outline-none focus:border-[#10b981]/50 transition-colors"
-              placeholder="@developer"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-[#8a98b3] mb-1.5 font-['Inter'] uppercase tracking-wider">Role</label>
-            <select value={role} onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-[#0a0d12] border border-[#1e2a3a] text-[#f1f3fc] font-['Inter'] text-sm focus:outline-none focus:border-[#10b981]/50 transition-colors"
-            >
-              <option value="editor">Editor</option>
-              <option value="commenter">Commenter</option>
-              <option value="reader">Reader</option>
-            </select>
-          </div>
-          {status && (
-            <div className={`px-4 py-3 rounded-lg text-sm font-['Inter'] ${
-              status.type === 'success'
-                ? 'bg-[#10b981]/10 border border-[#10b981]/25 text-[#10b981]'
-                : 'bg-red-900/20 border border-red-500/20 text-red-400'
-            }`}>
-              {status.msg}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface/80 backdrop-blur-xl animate-in fade-in duration-500">
+      <div className="glass-dark border border-white/10 rounded-[2.5rem] p-10 w-full max-w-md shadow-2xl relative overflow-hidden group">
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-[80px] group-hover:bg-primary/20 transition-all duration-1000" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-lg shadow-primary/5">
+              <span className="text-xl">🤝</span>
             </div>
-          )}
-          <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose}
-              className="flex-1 py-2.5 rounded-lg bg-[#0a0d12] border border-[#1e2a3a] text-[#8a98b3] font-['Inter'] text-sm hover:text-[#f1f3fc] transition-colors"
-            >Close</button>
-            <button type="submit" disabled={loading}
-              className="flex-1 py-2.5 rounded-lg bg-[#10b981] text-[#022c22] font-['Inter'] font-bold text-sm hover:bg-[#34d399] disabled:opacity-50 transition-all"
-            >{loading ? 'Inviting...' : 'Invite →'}</button>
+            <div>
+              <h3 className="font-heading font-black text-xl text-white tracking-tight uppercase leading-none mb-1">Collaborator Uplink</h3>
+              <p className="text-xs text-on-surface-muted font-bold uppercase tracking-widest">Expansion Protocol</p>
+            </div>
           </div>
-        </form>
+
+          <form onSubmit={handleInvite} className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-1">Terminal Handle</label>
+              <input
+                type="text" value={username} onChange={(e) => setUsername(e.target.value)}
+                required autoFocus
+                className="w-full px-5 py-4 rounded-2xl bg-surface-bright border border-surface-accent text-white font-mono text-sm placeholder-on-surface-dim/30 focus:outline-none focus:border-primary/50 transition-all outline-none"
+                placeholder="@username"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-1">Access Level</label>
+              <div className="grid grid-cols-3 gap-2">
+                {['editor', 'commenter', 'reader'].map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      role === r 
+                        ? 'bg-primary text-surface shadow-lg shadow-primary/20' 
+                        : 'bg-surface-bright text-on-surface-muted border border-surface-accent hover:border-primary/30'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {status && (
+              <div className={`px-5 py-4 rounded-2xl text-xs font-bold animate-in zoom-in-95 duration-300 ${
+                status.type === 'success'
+                  ? 'bg-primary/10 border border-primary/20 text-primary'
+                  : 'bg-red-500/10 border border-red-500/20 text-red-400'
+              }`}>
+                {status.msg}
+              </div>
+            )}
+
+            <div className="flex gap-4 pt-4">
+              <button type="button" onClick={onClose}
+                className="flex-1 py-4 rounded-2xl bg-surface-bright text-on-surface-muted font-black text-xs uppercase tracking-widest hover:text-white border border-surface-accent transition-all"
+              >Abort</button>
+              <button type="submit" disabled={loading}
+                className="flex-[1.5] py-4 rounded-2xl bg-primary text-surface font-black text-xs uppercase tracking-[0.2em] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] disabled:opacity-50 transition-all shadow-xl shadow-primary/20"
+              >{loading ? 'Transmitting...' : 'Link User'}</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
-
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -107,22 +130,17 @@ export const WebDevWorkspace = ({ project, onRefresh }: WebDevWorkspaceProps) =>
   const { user } = useAuthStore();
 
   const [showInvite, setShowInvite] = useState(false);
-  const [viewMode, setViewMode] = useState<'code' | 'preview'>('code');
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiMode, setAiMode] = useState<'chat' | 'weaver'>('weaver');
   const [chatOpen, setChatOpen] = useState(false);
   const [collabOpen, setCollabOpen] = useState(false);
   const [explorerOpen, setExplorerOpen] = useState(true);
+  const [viewMode, setViewMode] = useState<'code' | 'preview'>('code');
 
   const pendingInvites = project.pendingInvitations || [];
-
   const myId = user?._id || user?.id;
-  const isOwner =
-    project.owner &&
-    ((project.owner as any)._id === myId ||
-      (project.owner as any).id === myId ||
-      (project.owner as any) === myId);
-  const collabEntry = project.collaborators.find(
-    (c) => c.user._id === myId || (c.user as any) === myId || (c.user as any).id === myId
-  );
+  const isOwner = project.owner && ((project.owner as any)._id === myId || (project.owner as any).id === myId || (project.owner as any) === myId);
+  const collabEntry = project.collaborators.find((c) => c.user._id === myId || (c.user as any) === myId || (c.user as any).id === myId);
   const myRole = isOwner ? 'owner' : collabEntry?.role || 'editor';
 
   // Center slot: Code/Preview toggle

@@ -16,9 +16,13 @@ const PROMPT_SHORTCUTS = [
   { label: '♻️ Refactor', prompt: 'Suggest clean code refactoring improvements — better naming, smaller functions, reduced complexity.' },
   { label: '🧪 Test Cases', prompt: 'Generate comprehensive test cases for my code covering normal, edge, and error scenarios.' },
 ];
+import { useCollaborationStore } from '../../store/useCollaborationStore';
+
 export const AIChatPanel = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const { addMessage, clearHistory, getHistory } = useAIStore();
+  const { files, activeFileId, visitedFiles, terminalOutput, appendTerminal } = useCollaborationStore();
+  const activeFile = files.find(f => f.id === activeFileId);
   
   // Get history for the current project or default to welcome message
   const messages = projectId ? getHistory(projectId) : [];
@@ -34,11 +38,27 @@ export const AIChatPanel = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, loading]);
 
-  const getEditorCode = useCallback((): string => {
-    const editorInstance = (window as any).__monacoEditorInstance;
-    return editorInstance ? editorInstance.getValue() : '';
+  const getFocusedContext = useCallback(() => {
+    const editor = (window as any).__monacoEditorInstance;
+    if (!editor) return { full: '', focused: '', range: null };
+
+    const fullValue = editor.getValue();
+    const position = editor.getPosition();
+    if (!position) return { full: fullValue, focused: fullValue, range: null };
+
+    const lines = fullValue.split('\n');
+    const totalLines = lines.length;
+    const start = Math.max(0, position.lineNumber - 51); // 50 lines above
+    const end = Math.min(totalLines, position.lineNumber + 50); // 50 lines below
+    
+    const focused = lines.slice(start, end).join('\n');
+    return {
+      full: fullValue,
+      focused,
+      range: { start: start + 1, end }
+    };
   }, []);
 
   const applyCodeToEditor = (code: string) => {
@@ -113,7 +133,6 @@ export const AIChatPanel = () => {
             const match = part.match(/```(?:([a-z0-9+#-]+)\s*\n)?([\s\S]*?)```/i);
             const lang = match?.[1] || '';
             const code = match?.[2] || '';
-            const pureCode = isPureCode(msg.content);
             
             return (
               <div key={idx} className="rounded-lg overflow-hidden border border-[#1e2a3a] bg-[#0a0d12]">
@@ -151,6 +170,7 @@ export const AIChatPanel = () => {
     const trimmed = messageText.trim();
     if (!trimmed || loading) return;
 
+    const isDebug = trimmed.toLowerCase().startsWith('/debug');
     const userMsg: Message = { role: 'user', content: trimmed };
     if (projectId) addMessage(projectId, userMsg);
     setInput('');
@@ -158,11 +178,24 @@ export const AIChatPanel = () => {
     setShowShortcuts(false);
 
     try {
-      const codeContext = getEditorCode();
+      const { focused, full, range } = getFocusedContext();
+      
+      if (isDebug) {
+        appendTerminal("\n[SYSTEM] AI Architect is analyzing terminal logs for root cause analysis...\n");
+      }
         
       const { data } = await api.post('/ai/chat', {
         messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
-        codeContext: codeContext || '// No code in editor yet',
+        context: {
+          activeFile: {
+            name: activeFile?.name || 'unknown',
+            content: full,
+            focusedContent: focused,
+            range
+          },
+          recentFiles: visitedFiles,
+          terminalOutput: isDebug ? terminalOutput : null
+        }
       });
 
       const assistantMsg: Message = { role: 'assistant', content: data.response };
@@ -192,7 +225,12 @@ export const AIChatPanel = () => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-['Space_Grotesk'] font-semibold text-[#f1f3fc]">AI Assistant</p>
-            <p className="text-xs text-[#8a98b3] font-['Inter']">Lead Architect · Strategic Guard</p>
+            <div className="flex items-center gap-1.5 overflow-hidden">
+               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse flex-shrink-0" />
+               <p className="text-[10px] text-on-surface-muted font-bold uppercase tracking-wider truncate">
+                 Context: {activeFile?.name || 'Global Architect'}
+               </p>
+            </div>
           </div>
           {loading && (
             <div className="w-4 h-4 border-2 border-[#1e2a3a] border-t-[#a78bfa] rounded-full animate-spin" />

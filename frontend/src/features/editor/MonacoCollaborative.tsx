@@ -30,7 +30,16 @@ export const MonacoCollaborative = ({ projectId, language = 'javascript', role =
   const bindingRef = useRef<any>(null);
   const [engineReady, setEngineReady] = useState(false);
   const { user } = useAuthStore();
-  const { activeFileId, files } = useCollaborationStore();
+  const { activeFileId, files, addVisitedFile } = useCollaborationStore();
+  
+  useEffect(() => {
+    if (activeFileId && editorRef.current) {
+      const activeFile = files.find(f => f.id === activeFileId);
+      if (activeFile) {
+        addVisitedFile(activeFile.name, editorRef.current.getValue());
+      }
+    }
+  }, [activeFileId, addVisitedFile, files]);
 
   const activeFile = files.find((f) => f.id === activeFileId);
   const activeLang = activeFile?.language || language;

@@ -3,14 +3,34 @@ import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from '../store/useAuthStore';
 
 let globalSocket: Socket | null = null;
+let currentToken: string | null = null;
 const listeners = new Map<string, Set<() => void>>();
 
+// Subscribe to auth changes to reset socket on login/logout
+useAuthStore.subscribe((state) => {
+  if (state.accessToken !== currentToken) {
+    if (globalSocket) {
+      console.log('[REALTIME] Token changed, disconnecting socket...');
+      globalSocket.disconnect();
+      globalSocket = null;
+    }
+    currentToken = state.accessToken;
+  }
+});
+
 export const getGlobalSocket = () => {
-  if (globalSocket) return globalSocket;
-  
   const token = useAuthStore.getState().accessToken;
   if (!token) return null;
 
+  if (globalSocket && currentToken === token) return globalSocket;
+  
+  // Cleanup old socket if it exists but token mismatch (safety)
+  if (globalSocket) {
+    globalSocket.disconnect();
+    globalSocket = null;
+  }
+
+  currentToken = token;
   const serverUrl = (import.meta.env.VITE_WS_SERVER_URL || 'http://localhost:8080') as string;
   
   globalSocket = io(serverUrl, {

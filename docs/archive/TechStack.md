@@ -1,4 +1,4 @@
-# 🏗️ Tech Stack — DevVerse
+# 🏗️ Tech Stack — Developer's Den
 
 ---
 

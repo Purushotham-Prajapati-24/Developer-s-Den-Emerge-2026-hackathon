@@ -44,7 +44,7 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use(express.json({ limit: '500kb' }));
+app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 
 // MongoDB connection
@@ -66,7 +66,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', service: 'DevVerse Backend Engine' });
+  res.status(200).json({ status: 'ok', service: 'Developer\'s Den Backend Engine' });
 });
 
 // Serve backend static files (usually for shared assets or the internal public folder)
@@ -99,5 +99,5 @@ app.use((req, res) => {
 initSocketService({ server, corsOrigin: ALLOWED_ORIGINS });
 
 server.listen(PORT, () => {
-  console.log(`🚀 DevVerse Backend Server live on port ${PORT}`);
+  console.log(`🚀 Developer's Den Backend Server live on port ${PORT}`);
 });

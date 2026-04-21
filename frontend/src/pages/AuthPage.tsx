@@ -50,7 +50,7 @@ export default function AuthPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#a78bfa] to-[#7c3aed] flex items-center justify-center">
               <span className="text-white text-lg font-bold font-mono">D</span>
             </div>
-            <h1 className="text-2xl font-bold text-[#f1f3fc] font-['Space_Grotesk']">DevVerse</h1>
+            <h1 className="text-2xl font-bold text-[#f1f3fc] font-['Space_Grotesk']">Developer's Den</h1>
           </div>
           <p className="text-[#8a98b3] text-sm font-['Inter']">
             {mode === 'signin' ? 'Welcome back, developer.' : 'Create your developer profile.'}
@@ -165,7 +165,7 @@ export default function AuthPage() {
         </div>
 
         <p className="text-center text-xs text-[#3a4458] mt-6 font-['Inter']">
-          By continuing, you agree to DevVerse's terms of service.
+          By continuing, you agree to Developer's Den's terms of service.
         </p>
       </div>
     </div>

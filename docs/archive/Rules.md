@@ -1,4 +1,4 @@
-# 🚨 DevVerse — Agent Rules & Constraints
+# 🚨 Developer's Den — Agent Rules & Constraints
 
 ---
 

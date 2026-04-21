@@ -66,102 +66,109 @@ export const WorkspaceHeader = ({
   const { projectId } = useParams<{ projectId: string }>();
 
   return (
-    <header className="flex items-center justify-between px-4 py-2.5 border-b border-[#1e2a3a] flex-shrink-0 bg-[#0a0d12]">
-      {/* ── Left: back + project name + center slot ─────────────────── */}
-      <div className="flex items-center gap-3">
+    <header className="flex items-center justify-between px-6 py-3 border-b border-surface-accent flex-shrink-0 glass-dark z-[60] relative">
+      {/* ── Left Sector ── */}
+      <div className="flex items-center gap-5">
         <button
           onClick={() => navigate('/projects')}
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-[#8a98b3] hover:text-[#f1f3fc] hover:bg-[#1e2a3a] transition-all text-sm"
-          title="Back to projects"
+          className="w-10 h-10 flex items-center justify-center rounded-2xl text-on-surface-muted hover:text-white hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-surface-accent shadow-sm active:scale-95"
+          title="Back to Labs"
         >
-          ←
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
         </button>
-        <div className="w-px h-4 bg-[#1e2a3a]" />
-        <h1 className="font-['Space_Grotesk'] font-semibold text-sm text-[#f1f3fc]">
-          {title}
-        </h1>
-        {centerSlot && <div className="ml-2">{centerSlot}</div>}
+
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80">Active Workspace</span>
+          </div>
+          <h1 className="font-heading font-black text-sm text-white tracking-tight uppercase">
+            {title}
+          </h1>
+        </div>
+
+        {centerSlot && (
+          <div className="ml-4 pl-6 border-l border-surface-accent h-8 flex items-center">
+            {centerSlot}
+          </div>
+        )}
       </div>
 
-      {/* ── Right: collab avatars + invite + notifications + right slot ─ */}
-      <div className="flex items-center gap-3">
-        {/* Collaborator avatar strip */}
-        <button
-          onClick={onCollabClick}
-          className={`flex items-center -space-x-1.5 p-1 rounded-xl transition-all hover:bg-[#1e2a3a] ${
-            collabOpen ? 'bg-[#e2f0e0]/10 ring-1 ring-[#10b981]/30' : ''
-          }`}
-        >
-          {collaborators.slice(0, 5).map((c, i) =>
-            c.user.avatar ? (
-              <img
-                key={i}
-                src={c.user.avatar}
-                alt={c.user.username}
-                title={c.user.username}
-                className="w-6 h-6 rounded-full border-2 border-[#0a0d12] object-cover"
-              />
-            ) : (
-              <div
-                key={i}
-                title={c.user.username}
-                className="w-6 h-6 rounded-full border-2 border-[#0a0d12] bg-[#1e2a3a] flex items-center justify-center text-[9px] text-[#8a98b3] font-['Inter']"
-              >
-                {c.user.username?.[0]?.toUpperCase()}
-              </div>
-            )
-          )}
-
-          {/* Pending invitations */}
-          {pendingInvites.map((invite, i) => (
-            <div
-              key={`pending-${i}`}
-              className="relative opacity-40 hover:opacity-100 transition-opacity cursor-help"
-              title={`Invitation sent to @${invite.user.username} (Pending)`}
-            >
-              {invite.user.avatar ? (
+      {/* ── Right Sector ── */}
+      <div className="flex items-center gap-4">
+        {/* Collaborators Strip */}
+        <div className="flex items-center gap-1.5 pr-4 border-r border-surface-accent mr-2">
+          <button
+            onClick={onCollabClick}
+            className={`flex items-center -space-x-2.5 p-1.5 rounded-2xl transition-all duration-300 hover:bg-white/5 ${
+              collabOpen ? 'bg-primary/5 ring-1 ring-primary/30' : ''
+            }`}
+          >
+            {collaborators.slice(0, 5).map((c, i) =>
+              c.user.avatar ? (
                 <img
-                  src={invite.user.avatar}
-                  alt={invite.user.username}
-                  className="w-6 h-6 rounded-full border-2 border-dashed border-[#10b981]/50 object-cover"
+                  key={i}
+                  src={c.user.avatar}
+                  alt={c.user.username}
+                  className="w-8 h-8 rounded-xl border-2 border-surface object-cover ring-1 ring-white/5 shadow-xl"
                 />
               ) : (
-                <div className="w-6 h-6 rounded-full border-2 border-dashed border-[#10b981]/50 bg-[#1e2a3a] flex items-center justify-center text-[9px] text-[#8a98b3] font-['Inter']">
+                <div
+                  key={i}
+                  className="w-8 h-8 rounded-xl border-2 border-surface bg-surface-bright flex items-center justify-center text-[10px] text-on-surface-muted font-black ring-1 ring-white/5 shadow-xl"
+                >
+                  {c.user.username?.[0]?.toUpperCase()}
+                </div>
+              )
+            )}
+
+            {pendingInvites.map((invite, i) => (
+              <div key={`pending-${i}`} className="relative opacity-30 hover:opacity-100 transition-all cursor-help scale-90 group">
+                <div className="w-8 h-8 rounded-xl border-2 border-dashed border-primary/40 bg-surface-bright flex items-center justify-center text-[8px] text-on-surface-dim font-black">
                   {invite.user.username?.[0]?.toUpperCase()}
                 </div>
-              )}
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#10b981] rounded-full border border-[#0a0d12]" />
-            </div>
-          ))}
-        </button>
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-surface shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
+              </div>
+            ))}
+          </button>
+
+          <button
+            onClick={onInviteClick}
+            className="w-8 h-8 flex items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary hover:text-surface transition-all duration-300 shadow-lg shadow-primary/5"
+            title="Invite collaborators"
+          >
+            <span className="text-sm font-bold">＋</span>
+          </button>
+        </div>
 
         <NotificationBell />
-        <div className="w-px h-4 bg-[#1e2a3a]" />
 
-        <button
-          onClick={onInviteClick}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-[#1e2a3a] text-[#8a98b3] font-['Inter'] hover:border-[#10b981]/40 hover:text-[#10b981] transition-all"
-        >
-          + Invite
-        </button>
-        
         {showDeploy && projectId && (
-          <DeployButton projectId={projectId} />
+          <div className="mx-2">
+            <DeployButton projectId={projectId} />
+          </div>
         )}
 
-        <button
-          onClick={onChatClick}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-['Inter'] transition-all ${
-            chatOpen
-              ? 'bg-[#1e2a3a] text-[#f1f3fc] border border-[#2d3a4a]'
-              : 'bg-[#111720] text-[#8a98b3] border border-transparent hover:border-[#1e2a3a]'
-          }`}
-        >
-          💬 Team Chat
-        </button>
+        <div className="flex items-center gap-2 ml-2">
+          <button
+            onClick={onChatClick}
+            className={`group relative flex items-center gap-2.5 px-5 py-2.5 rounded-2xl transition-all duration-500 overflow-hidden ${
+              chatOpen
+                ? 'bg-white text-surface shadow-xl shadow-white/10'
+                : 'bg-surface-bright text-on-surface-muted hover:text-white hover:bg-white/5 border border-surface-accent'
+            }`}
+          >
+            <span className={`text-base ${chatOpen ? 'text-surface' : 'text-on-surface-dim group-hover:text-white'}`}>💬</span>
+            <span className="text-[11px] font-black uppercase tracking-widest">Chat</span>
+            {chatOpen && <div className="absolute inset-0 bg-white/10 animate-pulse" />}
+          </button>
 
-        {rightSlot}
+          {rightSlot}
+        </div>
       </div>
     </header>
   );
 };
+

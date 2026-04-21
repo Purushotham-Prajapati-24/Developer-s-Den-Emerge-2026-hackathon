@@ -44,7 +44,7 @@ export const createProject = async (req: AuthRequest, res: Response) => {
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Emerge</h1>
+        <h1>Welcome to Developer's Den</h1>
         <p>Use the Web Weaver AI on the right to start building.</p>
     </div>
 </body>
@@ -210,6 +210,8 @@ export const inviteCollaborator = async (req: AuthRequest, res: Response) => {
 
     // Real-time notification to target user
     io.to(`user:${targetUser._id}`).emit('notification-received');
+    // Signal project room that team info changed (new pending invite)
+    io.to(`project:${project._id}`).emit('collaborator-list-updated');
 
     return res.status(200).json({ message: 'Invitation sent to user' });
   } catch (error) {

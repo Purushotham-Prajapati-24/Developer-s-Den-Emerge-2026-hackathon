@@ -26,6 +26,10 @@ export const NotificationBell = () => {
 
   useEffect(() => {
     fetchNotifications();
+    
+    // Fallback polling every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   useRealTime('notification-received', () => {

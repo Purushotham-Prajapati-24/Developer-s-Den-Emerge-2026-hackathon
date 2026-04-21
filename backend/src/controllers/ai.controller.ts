@@ -13,6 +13,20 @@ const chatSchema = z.object({
     role: z.enum(['user', 'assistant', 'system']),
     content: z.string().min(1).max(20000),
   })).min(1),
+  codeContext: z.string().max(50000).optional(),
+  context: z.object({
+    activeFile: z.object({
+      name: z.string(),
+      content: z.string().optional().nullable(),
+      focusedContent: z.string().optional().nullable(),
+      range: z.object({ start: z.number(), end: z.number() }).nullable().optional()
+    }).optional(),
+    recentFiles: z.array(z.object({
+      name: z.string(),
+      content: z.string()
+    })).optional(),
+    terminalOutput: z.string().nullable().optional()
+  }).optional()
 });
 
 // POST /api/ai/suggest
@@ -33,20 +47,21 @@ export const getSuggestion = async (req: AuthRequest, res: Response) => {
 // POST /api/ai/chat
 export const getChatResponse = async (req: AuthRequest, res: Response) => {
   try {
-    const { messages } = chatSchema.parse(req.body);
-    const response = await requestChatResponse(messages);
+    const { messages, codeContext, context } = chatSchema.parse(req.body);
+    const response = await requestChatResponse(messages, codeContext, context);
     return res.status(200).json({ response });
   } catch (error: any) {
     if (error.name === 'ZodError') {
       return res.status(400).json({ message: 'Invalid chat context', errors: error.errors });
     }
+    console.error('AI Chat Error:', error);
     return res.status(500).json({ message: 'AI chat failed' });
   }
 };
 
 const webGenSchema = z.object({
   prompt: z.string().min(1).max(5000),
-  codeContext: z.string().max(50000).default(''),
+  codeContext: z.string().max(500000).default(''),
 });
 
 // POST /api/ai/web-generate
